@@ -1,0 +1,20 @@
+# Evaluation configuration
+
+defaults:
+  - base
+
+# Evaluation specific settings
+evaluation:
+  method: "evalplus"
+  benchmark: "humaneval"
+  
+  # Model settings
+  model_path: "/volume/pt-train/models/Qwen3-8B"
+  model_name: "qwen3-8b-base"
+  backend: "hf"  # 使用HuggingFace transformers后端
+  device_map: "cuda:0"  # 强制单卡，避免accelerate多卡分片导致错误
+  dtype: "bfloat16"      # 显式dtype（可选）
+  
+  # Output
+  output_dir: "outputs/results"
+  evalplus_root: "evalplus_results"  # 可自定义结果根目录

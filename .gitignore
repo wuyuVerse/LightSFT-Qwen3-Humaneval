@@ -1,0 +1,38 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Log files and data folders
+*.log
+logs/
+data/
+evalplus_results/
+outputs/
+nohup.out
+construct_triplets.log
+
+# Embedded git repositories
+src/eval/evalplus/
+src/training/LLaMA-Factory/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,46 @@
+# Base configuration for LightSFT-Qwen3-Humaneval
+
+# Data paths
+data:
+  input_file: "/volume/pt-train/users/wzhang/coder/coder-data/dataset/opc-sft-stage1/opc-sft-stage1_merged_chatml.jsonl"
+  output_dir: "data"
+  sample_size: 20000
+  seed: 42
+
+# Model paths
+model:
+  base_model: "/volume/pt-train/models/Qwen3-8B"
+  output_dir: "outputs/models"
+
+# Training settings
+training:
+  batch_size: 4
+  learning_rate: 5e-5
+  num_epochs: 3
+  warmup_steps: 100
+  save_steps: 500
+  eval_steps: 500
+  logging_steps: 100
+  max_length: 2048
+  gradient_accumulation_steps: 4
+
+# Evaluation settings
+evaluation:
+  output_dir: "outputs/results"
+  max_new_tokens: 512
+  temperature: 0.0
+  top_p: 0.9
+  do_sample: false
+
+# Logging
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "lightsft.log"
+
+# Hardware
+hardware:
+  device: "auto"
+  mixed_precision: "bf16"
+  deepspeed_config: null
+  use_flash_attention: true
