@@ -16,7 +16,13 @@ data/
 evalplus_results/
 outputs/
 nohup.out
+nohup_train.out
 construct_triplets.log
+
+# Training and evaluation outputs
+wandb_logs/
+saves/
+checkpoints/
 
 # Embedded git repositories
 src/eval/evalplus/
