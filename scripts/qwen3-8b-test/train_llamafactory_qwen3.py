@@ -14,7 +14,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--config",
         type=str,
-        default="config/qwen3_full_sft.yaml",
+        default="../../config/llamafactory_sft.yaml",
         help="Path to LLaMA-Factory training config YAML",
     )
     parser.add_argument(
@@ -60,7 +60,7 @@ def main() -> int:
     
     # Wandb offline mode
     os.environ["WANDB_MODE"] = "offline"
-    os.environ["WANDB_DIR"] = "./wandb_logs"
+    os.environ["WANDB_DIR"] = "../../wandb_logs"
     os.environ["WANDB_PROJECT"] = "LightSFT-Qwen3-Humaneval"
     os.environ["WANDB_RUN_NAME"] = f"qwen3-8b-sft-{args.devices.replace(',', '-')}gpu"
 

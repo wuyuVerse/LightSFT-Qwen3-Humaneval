@@ -12,7 +12,7 @@ def download_dataset():
     print("=== 下载HumanEval+数据集 ===")
     
     # 使用项目data目录
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).parent.parent.parent
     data_dir = project_root / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
     

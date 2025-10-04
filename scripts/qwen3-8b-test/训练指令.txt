@@ -1,0 +1,43 @@
+# 8卡训练指令：
+nohup uv run scripts/train_llamafactory_qwen3.py \
+  --config config/qwen3_full_sft.yaml \
+  --devices 0,1,2,3,4,5,6,7 \
+  > nohup_train.out 2>&1 &
+
+# 查看训练日志：
+tail -f nohup_train.out
+
+# 查看训练进程：
+ps aux | grep train_llamafactory
+
+# 停止训练（如需要）：
+pkill -f train_llamafactory
+
+1) Binarize
+INPUT_PATH="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/data/sampled_data_20000.jsonl" \
+OUTPUT_PATH="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/data/processed/sampled_data_20000.processed" \
+TOKENIZER_PATH="/volume/pt-train/models/Qwen3-8B" \
+bash scripts/sft_minimal.sh binarize
+说明：默认 SAVE_FORMAT=".npy"，生成文件为 ${OUTPUT_PATH}.npy，即 /.../processed/sft.jsonl.npy。
+
+2) Train
+# 可见卡（如需指定顺序）
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+
+# 分布式与精度（你的报错需要关闭 TF32）
+export NPROC_PER_NODE=8
+export TF32=False
+export BF16=True  # 视显卡与需求可改为 False
+
+# 负载建议（按显存调节）
+export MICRO_BATCH_SIZE=16
+export BATCH_SIZE=256   # => grad_accu = 256 / (8*16) = 2
+
+# 路径
+export DATA_PATH="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/data/processed/sampled_data_20000.processed.npy"
+export PRETRAINED_MODEL="/volume/pt-train/models/Qwen3-8B"
+export OUTPUT_DIR="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/saves/qwen3-8b-sft-8gpu"
+
+bash scripts/sft_minimal.sh train
+
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 && export NPROC_PER_NODE=8 && export TF32=False && export BF16=True && export MICRO_BATCH_SIZE=16 && export BATCH_SIZE=256 && export DATA_PATH="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/data/processed/sampled_data_20000.processed.npy" && export PRETRAINED_MODEL="/volume/pt-train/models/Qwen2.5-7B" && export OUTPUT_DIR="/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/saves/qwen2.5-7b-sft" && bash scripts/sft_minimal.sh train

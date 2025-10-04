@@ -42,3 +42,21 @@ src/training/LLaMA-Factory/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Evaluation results
+evalplus_results_*/
+
+# Training outputs
+src/training/Qwen*/
+
+# Data files
+data/*/
+!data/dataset_info.json
+
+# Logs
+*.log
+nohup.out
+
+# Temporary files
+*.tmp
+*.temp

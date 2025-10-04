@@ -1,53 +1,95 @@
-# Qwen SFT training configuration
+# Qwen3-Coder SFT Training Configuration
+# 基于原始框架的配置，适配现有脚本
 
-defaults:
-  - base
+# Model configuration
+model:
+  pretrained_model_path: "/volume/pt-train/models/Qwen3-8B"
+  tokenizer_path: "/volume/pt-train/models/Qwen3-8B"
+  model_max_length: 1280  # 与原始框架保持一致
+  trust_remote_code: true
 
-# Qwen SFT specific settings
+# Data configuration
+data:
+  raw_data_path: "data/sampled_data_20000.jsonl"
+  processed_data_path: "data/processed/sft_data.npy"  # 使用.npy格式
+  format: "chatml"
+  system_prompt: "You are Qwen, created by Alibaba Cloud. You are a helpful coding assistant."
+
+# Training configuration - 基于原始框架参数
 training:
-  method: "qwen_sft"
-  model_name: "qwen3-8b"
-  dataset_name: "custom_dataset"
+  # 训练模式：full 或 lora
+  mode: "full"  # full: 全量微调, lora: LoRA微调
   
-  # Qwen specific parameters
-  use_lora: true
-  lora_rank: 16
-  lora_alpha: 32
-  lora_dropout: 0.1
-  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+  # 输出目录
+  output_dir: "outputs/qwen_sft_checkpoints"
   
-  # Training parameters
-  per_device_train_batch_size: 2
-  per_device_eval_batch_size: 2
-  gradient_accumulation_steps: 8
-  learning_rate: 2e-4
+  # 原始框架训练参数
   num_train_epochs: 3
-  warmup_ratio: 0.1
-  weight_decay: 0.01
-  max_grad_norm: 1.0
+  batch_size: 1024  # 全局batch size
+  micro_batch_size: 16  # 每个设备的batch size
+  learning_rate: 5e-5
+  min_learning_rate: 5e-6
+  warmup_steps: 100
+  weight_decay: 0.0
+  lr_scheduler_type: "cosine"
   
-  # Generation parameters
-  max_length: 2048
-  max_new_tokens: 512
-  temperature: 0.7
-  top_p: 0.9
-  do_sample: true
-  
-  # Save and evaluation
+  # 保存和评估策略
+  evaluation_strategy: "no"
   save_strategy: "steps"
-  save_steps: 500
-  eval_strategy: "steps"
-  eval_steps: 500
-  logging_steps: 100
-  save_total_limit: 3
+  save_steps: 100
+  save_total_limit: 100
   
-  # Output
-  output_dir: "outputs/models/qwen_sft"
-  logging_dir: "logs/qwen_sft"
+  # 日志
+  logging_strategy: "steps"
+  logging_steps: 1
+  report_to: "tensorboard"
   
-  # Data
-  data_path: "outputs/data/sampled_data.jsonl"
-  max_samples: null  # Use all samples
+  # 优化设置
+  bf16: true
+  tf32: true
+  truncate_source: false
   
-  # System prompt
-  system_prompt: "You are a helpful coding assistant. Please provide accurate and helpful code solutions."
+  # LoRA配置（仅在mode为lora时生效）
+  use_peft: false  # 根据mode自动设置
+  peft_config_path: "configs/lora"
+
+# 分布式训练配置
+distributed:
+  # 分布式训练参数
+  master_addr: "localhost"
+  master_port: 6105
+  nnodes: 1  # 节点数量（单机）
+  node_rank: 0  # 当前节点rank
+  
+  # DeepSpeed配置
+  deepspeed_config: "configs/default_offload_opt_param.json"
+
+# 环境配置
+environment:
+  # CUDA设备（单机8卡）
+  cuda_visible_devices: "0,1,2,3,4,5,6,7"
+  
+  # NCCL配置
+  nccl_debug: "WARN"
+  
+  # 原始框架路径
+  sft_root_path: "src/training/Qwen3-Coder/finetuning/sft"
+  
+  # UV环境
+  uv_env_path: ".venv_qwen_sft"
+
+# 数据处理配置
+binarize:
+  workers: 64
+  chunk_size: 107374182400  # 0.1 * 2^30
+  max_len: 1280
+  save_format: ".npy"
+
+# Wandb配置
+wandb:
+  project: "qwen3-coder-sft"
+  entity: null
+  tags: ["qwen3", "sft", "coding"]
+  notes: "Qwen3-Coder SFT training using original framework"
+  mode: "offline"  # offline模式，之后可以用 wandb sync 上传
+  dir: "wandb_logs"  # wandb日志目录

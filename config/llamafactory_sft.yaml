@@ -20,7 +20,7 @@ preprocessing_num_workers: 16
 dataloader_num_workers: 4
 
 ### output
-output_dir: saves/qwen3-8b/full/sft
+output_dir: saves/llamafactory/full/sft
 logging_steps: 10
 save_steps: 1000
 plot_loss: true

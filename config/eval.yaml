@@ -8,12 +8,26 @@ evaluation:
   method: "evalplus"
   benchmark: "humaneval"
   
-  # Model settings
-  model_path: "/volume/pt-train/models/Qwen3-8B"
-  model_name: "qwen3-8b-base"
-  backend: "hf"  # 使用HuggingFace transformers后端
-  device_map: "cuda:0"  # 强制单卡，避免accelerate多卡分片导致错误
+  # Evaluation mode: 'auto', 'base', 'chat'
+  # auto: 自动根据模型路径判断 (推荐)
+  # base: 基础模型评测
+  # chat: 微调模型评测
+  eval_mode: "auto"
+  
+  # Model settings - Fine-tuned model (vLLM backend for speed)
+  model_path: "/volume/pt-train/users/wzhang/wjj-workspace/LightSFT-Qwen3-Humaneval/saves/llamafactory/full/sft"
+  model_name: "qwen3-8b-sft"
+  backend: "vllm"  # 使用vLLM后端支持多GPU并行推理
+  tp: 4  # 张量并行度，使用4张GPU
   dtype: "bfloat16"      # 显式dtype（可选）
+  cuda_visible_devices: "1,2,3,4"  # 使用前4张GPU
+  
+  # Alternative: Base model settings (HF backend)
+  # eval_mode: "base"
+  # model_path: "/volume/pt-train/models/Qwen3-8B"
+  # model_name: "qwen3-8b-base"
+  # backend: "hf"  # 使用HuggingFace transformers后端
+  # cuda_visible_devices: "0"  # 单卡模式
   
   # Output
   output_dir: "outputs/results"
